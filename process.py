@@ -57,10 +57,11 @@ def do_basic_eda(dataset):
 
 def preprocess(s, method="lemm_v"):
     assert method in ['cased', 'uncased', 'lemm', 'lemm_v', 'stemm']
+    s = s.strip()
     if method == 'cased':
-        return re.sub(r"[^a-zA-Z0-9]", " ", s).strip()
+        return s
     elif method == 'uncased':
-        return re.sub(r"[^a-zA-Z0-9]", " ", s.lower()).strip()
+        return s.lower()
     elif method == 'lemm_v':
         return WordNetLemmatizer().lemmatize(s.lower(), pos="v")
     elif method == 'lemm':
@@ -69,15 +70,17 @@ def preprocess(s, method="lemm_v"):
         return PorterStemmer().stem(s.lower())
 
 def get_vocab(dataset, method='lemm_v'):
-    texts = [preprocess(sample['text'], method=method).split() for sample in dataset]
+    texts = [re.sub(r"[^a-zA-Z0-9]", " ", sample['text']).split() for sample in dataset]
     words = set([w for text in texts for w in text])
+    words = set([preprocess(w, method=method) for w in words])
     vocab = dict(zip(words, range(2, len(words) +2)))
     vocab["<PAD>"] = 0
     vocab["<UNK>"] = 1
     return vocab, {v: k for k, v in vocab.items()}
 
 def get_X_y(dataset, vocab, method="lemm_v", max_seq_len=100):
-    texts = [preprocess(sample['text'], method=method).split() for sample in dataset]
+    texts = [re.sub(r"[^a-zA-Z0-9]", " ", sample['text']).split() for sample in dataset]
+    texts = [[preprocess(w, method=method) for w in text] for text in texts]
     X = [[vocab[w] for w in text] for text in texts]
     y = [sample['austen'] for sample in dataset]
 
@@ -122,7 +125,7 @@ if __name__ == "__main__":
     
     logger.info('\tBalancing class supports..')
     logger.info(f'\t\tOriginal class supports: pos - {y[y==1].shape[0]}; neg - {y[y==0].shape[0]}')
-    X, y = resample(X, y, strategy="UnderSample")
+    X, y = resample(X, y, strategy=args_.strategy)
     logger.info(f'\t\tBalanced supports: pos - {y[y==1].shape[0]}; neg - {y[y==0].shape[0]}') 
     
     sleep(0.1)
