@@ -55,7 +55,8 @@ def get_training_args():
                         default=1)
     
     parser.add_argument('--num_epochs',
-                        type=int)
+                        type=int,
+                        default=3)
 
     parser.add_argument('--batch_size',
                         type=int,
