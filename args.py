@@ -21,7 +21,7 @@ def get_processing_args():
 
     parser.add_argument('--strategy',
                         type=str,
-                        default='OverSampling',
+                        default='UnderSample',
                         help= "Choose resampling strategy from UderSample, OverSample or None")
 
     parser.add_argument('--train_test_split',
