@@ -28,8 +28,10 @@ python
 ```
 python process.py 
 ```
+- [ ] Run model training:
+```
 python train.py --model_path <model-path>
-
+```
 
 - [ ] To see the TensorBoard visualizations of training use the following command:
 ```
